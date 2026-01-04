@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PTM 数据库 Motif 特性对比</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+
+    .category-badge{
+      display:inline-flex; align-items:center;
+      padding:0.125rem 0.5rem; border-radius:9999px;
+      font-size:0.75rem; font-weight:500;
+      margin-bottom:0.25rem; margin-right:0.25rem;
+      white-space:nowrap;
+    }
+
+    .badge-yes{ background-color:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
+    .badge-partial{ background-color:#fef9c3; color:#854d0e; border:1px solid #fde047; }
+    .badge-no{ background-color:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+
+    .expandable-content{
+      max-height:80px; overflow:hidden; position:relative;
+      transition:max-height 0.3s ease-out;
+    }
+    .expandable-content.expanded{ max-height:none; }
+
+    .expand-btn{
+      display:none;
+      background: linear-gradient(to bottom, transparent, white);
+      position:absolute; bottom:0; left:0; right:0;
+      text-align:center; padding-top:20px;
+      cursor:pointer; font-size:0.8rem; color:#2563eb; font-weight:600;
+      user-select:none;
+    }
+    .expandable-content.has-overflow .expand-btn{ display:block; }
+    .expandable-content.expanded .expand-btn{
+      position:static; background:none; padding-top:6px;
+    }
+
+    .metric-value{ font-variant-numeric: tabular-nums; }
+
+    /* Sticky header (optional but useful) */
+    th{ position:sticky; top:0; z-index:10; }
+  </style>
+</head>
+
+<body class="p-4 md:p-8 text-slate-800">
+  <div class="max-w-[96rem] mx-auto">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-2">PTM 数据库 Motif 特性对比表</h1>
+      <p class="text-slate-600">
+        对比各类 PTM 数据库对 “是否存在公认短 Motif/序列信号”的支持程度（Strong / Partial / No），并补充数据库定位。
+        <span class="text-slate-400">（引用/年份为粗略标注，最终以数据库/论文最新信息为准）</span>
+      </p>
+    </header>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[1200px]">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="p-4 font-bold text-slate-700 w-[14%]">数据库</th>
+              <th class="p-4 font-semibold text-slate-600 w-[6%] text-center">年份</th>
+              <th class="p-4 font-semibold text-slate-600 w-[6%] text-center">引用</th>
+
+              <th class="p-4 font-semibold text-emerald-700 w-[18%] bg-emerald-50/50 border-r border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  Strong Motif (Yes)
+                </div>
+                <div class="text-xs font-normal text-emerald-600 mt-1">公认固定短模式</div>
+              </th>
+
+              <th class="p-4 font-semibold text-amber-700 w-[18%] bg-amber-50/50 border-r border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  Partial / Context
+                </div>
+                <div class="text-xs font-normal text-amber-600 mt-1">依赖上下文/弱共识</div>
+              </th>
+
+              <th class="p-4 font-semibold text-slate-600 w-[26%] bg-slate-50/50 border-r border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                  No Wide Motif (No)
+                </div>
+                <div class="text-xs font-normal text-slate-500 mt-1">多数无统一短 Motif（More 可看完整类型）</div>
+              </th>
+
+              <th class="p-4 font-semibold text-slate-700 w-[12%]">Notes / 定位</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-200">
+
+            <!-- PhosphoSitePlus -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">PhosphoSitePlus</div>
+                <div class="text-xs text-slate-500 mt-1">PSP</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2018</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">321</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="category-badge badge-yes">SUMOylation</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">Ψ-K-x-E（常见共识）</div>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="category-badge badge-partial">Phosphorylation</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">S/T/Y；多为 kinase-specific motifs</div>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <div class="flex flex-wrap">
+                  <span class="category-badge badge-no">Acetylation</span>
+                  <span class="category-badge badge-no">Methylation</span>
+                  <span class="category-badge badge-no">Ubiquitination</span>
+                  <span class="category-badge badge-no">Neddylation</span>
+                  <span class="category-badge badge-no">O-GlcNAc</span>
+                  <span class="category-badge badge-no">O-glycosylation</span>
+                </div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> 磷酸化为主，兼收多类修饰位点。</p>
+                <p class="mt-2 text-xs text-slate-400">Ref: PSP / database site</p>
+              </td>
+            </tr>
+
+            <!-- dbPTM -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">dbPTM</div>
+                <div class="text-xs text-slate-500 mt-1">90+ PTM Types</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold metric-value">2024</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">19</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <div class="flex flex-col gap-1">
+                  <div><span class="category-badge badge-yes">N-linked glycosylation</span><span class="text-xs text-slate-400 ml-1">N-{P}-[ST]-{P}</span></div>
+                  <div><span class="category-badge badge-yes">N-myristoylation</span><span class="text-xs text-slate-400 ml-1">N-term Gly</span></div>
+                  <div><span class="category-badge badge-yes">Prenylation</span><span class="text-xs text-slate-400 ml-1">CaaX</span></div>
+                  <div><span class="category-badge badge-yes">SUMOylation</span><span class="text-xs text-slate-400 ml-1">Ψ-K-x-E</span></div>
+                  <div><span class="category-badge badge-yes">C-mannosylation</span><span class="text-xs text-slate-400 ml-1">W-x-x-W</span></div>
+                </div>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <div class="flex flex-col gap-1">
+                  <div><span class="category-badge badge-partial">Phosphorylation</span><span class="text-xs text-slate-400 ml-1">kinase-specific</span></div>
+                  <div><span class="category-badge badge-partial">Hydroxylation</span><span class="text-xs text-slate-400 ml-1">enzyme/structure</span></div>
+                  <div><span class="category-badge badge-partial">Tyrosine sulfation</span><span class="text-xs text-slate-400 ml-1">acidic bias</span></div>
+                  <div><span class="category-badge badge-partial">GPI-anchor</span><span class="text-xs text-slate-400 ml-1">C-term signal</span></div>
+                </div>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <div class="expandable-content" id="dbptm-all">
+                  <div class="flex flex-wrap content-start" id="dbptm-all-badges"></div>
+                  <div class="expand-btn"
+                       data-more="More: show all dbPTM types (90+)"
+                       data-less="Show less"
+                       onclick="toggleExpand('dbptm-all')">
+                    More: show all dbPTM types (90+)
+                  </div>
+                </div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> “类型覆盖最全”的聚合库；适合做 PTM 类型全景盘点。</p>
+                <p class="mt-2 text-xs text-slate-400">Ref: dbPTM browse_type</p>
+              </td>
+            </tr>
+
+            <!-- CPLM -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">CPLM</div>
+                <div class="text-xs text-slate-500 mt-1">Lysine Mods</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2021</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">69</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—（数据库定位不以短 Motif 归类为主）</span>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="category-badge badge-partial">S-palmitoylation</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">更多依赖上下文/环境</div>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <div class="expandable-content" id="cplm-types">
+                  <div class="flex flex-wrap content-start" id="cplm-types-badges"></div>
+                  <div class="expand-btn"
+                       data-more="More: show all CPLM types"
+                       data-less="Show less"
+                       onclick="toggleExpand('cplm-types')">
+                    More: show all CPLM types
+                  </div>
+                </div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> 赖氨酸修饰专题库（多类 acylation + ubiquitylation 等）。</p>
+                <p class="mt-2 text-xs text-slate-400">Ref: CPLM download page</p>
+              </td>
+            </tr>
+
+            <!-- iUUCD -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">iUUCD</div>
+                <div class="text-xs text-slate-500 mt-1">Regulators</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2017</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">94</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="category-badge badge-yes">SUMOylation</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">UBL family</div>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—</span>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <span class="category-badge badge-no">Ubiquitination</span>
+                <span class="category-badge badge-no">UBL-like</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">偏“调控因子/酶”，非 motif-driven 位点库</div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> UB/UBL 体系 E1/E2/E3/DUB 等调控因子汇总。</p>
+              </td>
+            </tr>
+
+            <!-- UbiBrowser -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">UbiBrowser</div>
+                <div class="text-xs text-slate-500 mt-1">E3–Substrate</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2022</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">164</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—</span>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—</span>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <span class="category-badge badge-no">Ubiquitination</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">位点选择多依赖互作/结构，无统一短 consensus</div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> E3/DUB–substrate 网络；偏调控网络而非 motif 表。</p>
+              </td>
+            </tr>
+
+            <!-- ======== 新增数据库（扩充数量） ======== -->
+
+            <!-- UniProtKB -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">UniProtKB</div>
+                <div class="text-xs text-slate-500 mt-1">Curated KB</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2025</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-slate-400 font-semibold text-sm metric-value">—</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <div class="flex flex-wrap">
+                  <span class="category-badge badge-yes">N-glycosylation</span>
+                  <span class="category-badge badge-yes">Prenylation (CaaX)</span>
+                  <span class="category-badge badge-yes">N-myristoylation</span>
+                </div>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <div class="flex flex-wrap">
+                  <span class="category-badge badge-partial">Phosphorylation</span>
+                  <span class="category-badge badge-partial">Signal peptides / GPI-like</span>
+                </div>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <div class="flex flex-wrap">
+                  <span class="category-badge badge-no">Ubiquitination</span>
+                  <span class="category-badge badge-no">Acetylation</span>
+                  <span class="category-badge badge-no">Methylation</span>
+                  <span class="category-badge badge-no">O-GlcNAc</span>
+                </div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> 蛋白知识库（人工注释 + 证据链）；包含 PTM feature，但不以 motif 分类为主线。</p>
+              </td>
+            </tr>
+
+            <!-- iPTMnet -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">iPTMnet</div>
+                <div class="text-xs text-slate-500 mt-1">Enzyme–Substrate</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2017</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">172</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—</span>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="category-badge badge-partial">Phosphorylation</span>
+                <span class="category-badge badge-partial">Acetylation</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">更多体现为酶-底物/通路上下文</div>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <div class="flex flex-wrap">
+                  <span class="category-badge badge-no">Ubiquitination</span>
+                  <span class="category-badge badge-no">SUMOylation</span>
+                  <span class="category-badge badge-no">Methylation</span>
+                  <span class="category-badge badge-no">Glycosylation</span>
+                </div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> PTM 网络/酶-底物证据整合；motif 不是主要组织方式。</p>
+              </td>
+            </tr>
+
+            <!-- PTMcode -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">PTMcode</div>
+                <div class="text-xs text-slate-500 mt-1">Crosstalk</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2014</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">109</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—</span>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="category-badge badge-partial">Phosphorylation</span>
+                <span class="category-badge badge-partial">Regulatory context</span>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <div class="flex flex-wrap">
+                  <span class="category-badge badge-no">Acetylation</span>
+                  <span class="category-badge badge-no">Ubiquitination</span>
+                  <span class="category-badge badge-no">Methylation</span>
+                  <span class="category-badge badge-no">Multiple PTMs</span>
+                </div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> PTM 共定位/共调控（crosstalk）分析；更偏统计与网络层面。</p>
+              </td>
+            </tr>
+
+            <!-- dbSNO -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">dbSNO 2.0</div>
+                <div class="text-xs text-slate-500 mt-1">S-nitrosylation</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2015</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">73</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—</span>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="category-badge badge-partial">Redox context</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">微环境/可及性强相关</div>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <span class="category-badge badge-no">S-nitrosylation (C)</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">通常无统一短 motif</div>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> SNO 专题位点库；适合做 redox PTM 汇总与验证。</p>
+              </td>
+            </tr>
+
+            <!-- O-GlcNAcAtlas / O-GlcNAcome -->
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="p-4 align-top">
+                <div class="font-bold text-lg text-indigo-700">O-GlcNAcAtlas 4.0</div>
+                <div class="text-xs text-slate-500 mt-1">O-GlcNAc</div>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold metric-value">2025</span>
+              </td>
+              <td class="p-4 align-top text-center">
+                <span class="text-indigo-600 font-bold text-sm metric-value">5</span>
+              </td>
+              <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                <span class="text-xs text-slate-400 italic">—</span>
+              </td>
+              <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                <span class="category-badge badge-partial">O-GlcNAc context</span>
+                <div class="text-xs text-slate-500 mt-1 pl-1">无硬 sequon，偏无序区/上下文</div>
+              </td>
+              <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                <span class="category-badge badge-no">O-GlcNAcylation</span>
+              </td>
+              <td class="p-4 align-top text-sm text-slate-600">
+                <p><strong>核心：</strong> O-GlcNAc 专题资源；常用于位点目录与文献映射。</p>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bg-slate-50 p-4 text-xs text-slate-500 border-t border-slate-200">
+        注：Strong Motif = 广泛接受的短序列共识（如 ΨKxE、CaaX、NXS/T 等）；Partial = 依赖酶/结构/末端信号或弱共识；No = 通常无统一短 Motif，更依赖结构、互作与环境。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleExpand(id){
+      const el = document.getElementById(id);
+      const btn = el.querySelector('.expand-btn');
+      const more = btn.getAttribute('data-more') || 'More';
+      const less = btn.getAttribute('data-less') || 'Show less';
+
+      if(el.classList.contains('expanded')){
+        el.classList.remove('expanded');
+        btn.textContent = more;
+      }else{
+        el.classList.add('expanded');
+        btn.textContent = less;
+      }
+    }
+
+    function renderBadge(container, text, cls){
+      const s = document.createElement('span');
+      s.className = `category-badge ${cls}`;
+      s.textContent = text;
+      container.appendChild(s);
+    }
+
+    function renderGroup(container, title){
+      const h = document.createElement('div');
+      h.className = 'w-full text-xs font-semibold text-slate-500 mt-2';
+      h.textContent = title;
+      container.appendChild(h);
+    }
+
+    // ====== FULL lists (rendered dynamically to keep HTML clean) ======
+
+    const DBPTM_GROUPS = [
+      {
+        title: 'General / common PTMs',
+        items: [
+          'Acetylation', 'ADP-ribosylation',
+          'Amidation (A/R/N/C)', 'Carboxylation (K)',
+          'Citrullination', 'Crotonylation', 'Formylation',
+          'γ-carboxylation (Gla)', 'Glutathionylation',
+          'Hydroxylation', 'Lipoylation', 'Malonylation',
+          'Methylation (K/R; multi-states)', 'Nitration',
+          'Oxidation (Met sulfoxide/sulfone)',
+          'Phosphorylation (S/T/Y/H/...)',
+          'Pyrrolidone carboxylic acid',
+          'Pyrrolylation', 'Pyruvate',
+          'S-nitrosylation', 'Succinylation', 'Sulfation'
+        ]
+      },
+      {
+        title: 'Glycosylation (dbPTM browse_type)',
+        items: [
+          'C-linked glycosylation (WxxW; C-mannosylation)',
+          'N-linked glycosylation (NXS/T family; residue-specific entries)',
+          'O-linked glycosylation (O-GalNAc / O-GlcNAc / O-Fuc / O-Man / O-Glc; residue-specific entries)',
+          'S-linked glycosylation (C/S/T/W entries)'
+        ]
+      },
+      {
+        title: 'Lipidation / conjugations',
+        items: [
+          'GPI-anchor (C-term signal; residue-specific entries)',
+          'Myristoylation (N-term Gly; also rare K entries)',
+          'Palmitoylation (Cys/others; includes prenyl-like Cys entries in dbPTM browse)',
+          'S-diacylglycerol (Cys; bacterial-like)',
+          'SUMOylation (K; SUMO-conjugated)',
+          'Ubiquitination (multi-residue entries in browse_type)'
+        ]
+      }
+    ];
+
+    const CPLM_GROUPS = [
+      {
+        title: 'CPLM (download page listed types)',
+        items: [
+          'Ubiquitylation', 'Acetylation', 'Succinylation', 'Crotonylation',
+          'Malonylation', 'Propionylation', 'Butyrylation', 'Lactylation',
+          '2-hydroxyisobutyrylation (Khib)', 'Glutarylation',
+          'β-hydroxybutyrylation', 'Benzoylation', 'Glycation',
+          'Glutathionylation', 'S-palmitoylation'
+        ]
+      }
+    ];
+
+    window.addEventListener('load', () => {
+      // Render dbPTM badges
+      const dbptm = document.getElementById('dbptm-all-badges');
+      DBPTM_GROUPS.forEach(g => {
+        renderGroup(dbptm, g.title);
+        g.items.forEach(x => renderBadge(dbptm, x, 'badge-no'));
+      });
+
+      // Render CPLM badges
+      const cplm = document.getElementById('cplm-types-badges');
+      CPLM_GROUPS.forEach(g => {
+        renderGroup(cplm, g.title);
+        g.items.forEach(x => renderBadge(cplm, x, 'badge-no'));
+      });
+
+      // Overflow check (after rendering)
+      document.querySelectorAll('.expandable-content').forEach(el => {
+        if(el.scrollHeight > 80) el.classList.add('has-overflow');
+      });
+    });
+  </script>
+</body>
+</html>
