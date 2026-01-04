@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSSP + ASA/SASA：可做的下游分析清单（对齐 Cell 2023 案例）</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+
+    .category-badge {
+      display: inline-flex; align-items: center;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem; font-weight: 500;
+      margin-bottom: 0.25rem; margin-right: 0.25rem;
+      white-space: nowrap;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: rgba(15, 23, 42, 0.04);
+      color: #0f172a;
+    }
+    .badge-ss { background: rgba(59, 130, 246, 0.10); border-color: rgba(59, 130, 246, 0.18); color: #1d4ed8; }
+    .badge-asa { background: rgba(16, 185, 129, 0.10); border-color: rgba(16, 185, 129, 0.18); color: #047857; }
+    .badge-stat { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.20); color: #b45309; }
+    .badge-1d { background: rgba(168, 85, 247, 0.10); border-color: rgba(168, 85, 247, 0.18); color: #7c3aed; }
+    .badge-3d { background: rgba(239, 68, 68, 0.10); border-color: rgba(239, 68, 68, 0.18); color: #b91c1c; }
+    .badge-var { background: rgba(100, 116, 139, 0.12); border-color: rgba(100, 116, 139, 0.20); color: #334155; }
+    .badge-drug { background: rgba(20, 184, 166, 0.12); border-color: rgba(20, 184, 166, 0.22); color: #0f766e; }
+
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(2, 6, 23, 0.06);
+      border: 1px solid rgba(2, 6, 23, 0.06);
+    }
+    .muted { color: #64748b; }
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      border-radius: 0.5rem;
+      padding: 0.05rem 0.4rem;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 1rem;
+      border: 1px solid rgba(2, 6, 23, 0.06);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.85rem 0.9rem; vertical-align: top; }
+    th {
+      text-align: left;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      color: #0f172a;
+      background: rgba(2, 6, 23, 0.03);
+      border-bottom: 1px solid rgba(2, 6, 23, 0.06);
+      white-space: nowrap;
+    }
+    td { border-bottom: 1px solid rgba(2, 6, 23, 0.06); color: #0f172a; }
+    tr:last-child td { border-bottom: none; }
+    .small { font-size: 0.9rem; }
+    details summary { cursor: pointer; }
+  </style>
+</head>
+
+<body>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">
+          DSSP + ASA/SASA：可做的下游分析清单
+        </h1>
+        <p class="muted text-base">
+          结构特征来自 <span class="kbd">DSSP (secondary structure + ASA)</span> 与 <span class="kbd">FreeSASA (SASA total/main/side)</span>。
+          下游分析思路对齐 Cell 2023 文章（Geffen et al., S009286742300781X）的“PTM 分层解释 / 串扰 / 3D clumps / 治疗可行性”框架。
+        </p>
+      </div>
+
+      <!-- Feature chips -->
+      <div class="mt-4">
+        <span class="category-badge badge-ss">Secondary structure (DSSP SS)</span>
+        <span class="category-badge badge-asa">Solvent accessibility (ASA/SASA)</span>
+        <span class="category-badge badge-stat">Enrichment / Statistics</span>
+        <span class="category-badge badge-1d">1D neighbourhood (±5 aa)</span>
+        <span class="category-badge badge-3d">3D proximity / Clumps</span>
+        <span class="category-badge badge-var">Variant overlay (SNP/ClinVar/TCGA)</span>
+        <span class="category-badge badge-drug">Actionability / Therapeutics</span>
+      </div>
+    </div>
+
+    <!-- Quick notes -->
+    <div class="card p-5 mb-6">
+      <h2 class="text-lg font-semibold text-slate-900 mb-2">Practical notes（建议写进 Methods 的关键点）</h2>
+      <div class="grid sm:grid-cols-2 gap-4 text-sm text-slate-700">
+        <div>
+          <div class="font-medium text-slate-900 mb-1">1) Exposure definition</div>
+          <p class="muted">
+            你目前拿到的是 <span class="kbd">ASA/SASA</span>（绝对面积）。跨氨基酸类型比较建议转成
+            <span class="kbd">RSA = ASA / MaxASA</span> 或使用分位数阈值（e.g., top 25% = exposed）。
+          </p>
+        </div>
+        <div>
+          <div class="font-medium text-slate-900 mb-1">2) Secondary structure bins</div>
+          <p class="muted">
+            DSSP 可先合并为 <span class="kbd">H (helix)</span> / <span class="kbd">E (beta)</span> / <span class="kbd">C (coil/loop)</span>，
+            便于做富集与解释；也可保留原始 DSSP 8-state 作为更细粒度特征。
+          </p>
+        </div>
+        <div>
+          <div class="font-medium text-slate-900 mb-1">3) 1D vs 3D crosstalk</div>
+          <p class="muted">
+            先做 ±5 aa 的线性邻域共现（协作/竞争），再用 3D 距离（e.g., Cα < 8Å）做 clumps，可显著提高“机制可信度”。
+          </p>
+        </div>
+        <div>
+          <div class="font-medium text-slate-900 mb-1">4) Output design</div>
+          <p class="muted">
+            建议输出 4 张核心表：<span class="kbd">SS/Exposure enrichment</span>、
+            <span class="kbd">1D crosstalk pairs</span>、<span class="kbd">3D clumps</span>、
+            <span class="kbd">Variant→PTM loss candidates</span>。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main table -->
+    <div class="card p-5">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">Downstream analyses（整理成“可直接跑”的模块）</h2>
+          <p class="muted text-sm mt-1">
+            Column labels use British English; explanations are in 中文（含必要术语英文）。
+          </p>
+        </div>
+        <div class="text-right text-xs muted">
+          Reference anchor: <span class="kbd">[R1]</span> = Geffen et al., Cell 2023
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="min-width: 220px;">Module</th>
+              <th style="min-width: 260px;">Research question</th>
+              <th style="min-width: 260px;">Inputs (from DSSP+ASA)</th>
+              <th style="min-width: 260px;">Method / Test</th>
+              <th style="min-width: 300px;">Deliverables</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 1 -->
+            <tr>
+              <td>
+                <div class="font-semibold">1) Structural preference enrichment</div>
+                <div class="mt-2">
+                  <span class="category-badge badge-stat">Hypergeometric</span>
+                  <span class="category-badge badge-ss">SS</span>
+                  <span class="category-badge badge-asa">ASA/SASA</span>
+                </div>
+                <div class="text-xs muted mt-2">Aligns with [R1] enrichment-style interpretations.</div>
+              </td>
+              <td class="small">
+                某类 PTM 是否更偏好出现在 <b>暴露</b> 残基或某种 <b>二级结构</b>（helix/beta/coil）？
+                不同组别/亚型下偏好是否变化？
+              </td>
+              <td class="small">
+                <span class="kbd">dssp_ss</span>（H/E/C），
+                <span class="kbd">dssp_asa</span> 或 <span class="kbd">sasa_total</span>（分箱：exposed/buried 或 quantiles）
+              </td>
+              <td class="small">
+                Fisher’s exact / Hypergeometric test；多重检验校正（FDR）。
+                背景可选：同蛋白可修饰残基集合、或全 proteome 同类残基集合。
+              </td>
+              <td class="small">
+                富集表（OR、p、FDR）；按 PTM 类型/物种/蛋白家族分层的对比图；
+                用于“结构偏好”结论与筛选候选位点。
+              </td>
+            </tr>
+
+            <!-- 2 -->
+            <tr>
+              <td>
+                <div class="font-semibold">2) Positive vs negative site modelling</div>
+                <div class="mt-2">
+                  <span class="category-badge badge-stat">Classification</span>
+                  <span class="category-badge badge-ss">SS</span>
+                  <span class="category-badge badge-asa">ASA/SASA</span>
+                </div>
+              </td>
+              <td class="small">
+                结构语境能否区分 “真 PTM 位点” vs “阴性位点”（同氨基酸类型但未修饰）？
+                哪些结构特征最关键（解释性）？
+              </td>
+              <td class="small">
+                单残基：SS、ASA/SASA；<br/>
+                窗口特征：±k aa 的 SS composition、ASA 均值/方差；可加氨基酸类别等。
+              </td>
+              <td class="small">
+                Logistic regression / Random forest / XGBoost；
+                交叉验证；SHAP/feature importance 解释。
+              </td>
+              <td class="small">
+                位点打分（likelihood）；“结构证据加权”的 PTM priority list；
+                后续可用于过滤 buried 位点或提升 exposed-loop 位点权重。
+              </td>
+            </tr>
+
+            <!-- 3 -->
+            <tr>
+              <td>
+                <div class="font-semibold">3) 1D neighbourhood crosstalk (±5 aa)</div>
+                <div class="mt-2">
+                  <span class="category-badge badge-1d">±5 aa</span>
+                  <span class="category-badge badge-stat">Co-occurrence</span>
+                  <span class="category-badge badge-asa">Exposure stratification</span>
+                </div>
+                <div class="text-xs muted mt-2">Matches your example: 同蛋白近邻位点协作/竞争。</div>
+              </td>
+              <td class="small">
+                同一蛋白内，PTM 是否在序列上成“区域”（~5 aa）共现？哪些组合体现协作/竞争？
+                加上暴露度后是否更像“可酶访问的真实串扰”？
+              </td>
+              <td class="small">
+                位点坐标 + ±5 aa window；<br/>
+                window 内位点的 SS/ASA/SASA 分层（exposed vs buried）。
+              </td>
+              <td class="small">
+                共现矩阵 + permutation background（保持每蛋白 PTM 数不变）；
+                Fisher/Hypergeometric；网络分析（community）。
+                （[R1] 有乙酰化-磷酸化串扰的分析思路）
+              </td>
+              <td class="small">
+                显著 PTM pair 列表（方向：协作/互斥）；<br/>
+                结构分层后的“高可信串扰对”（exposed-loop enriched）；<br/>
+                可视化：热图/网络图。
+              </td>
+            </tr>
+
+            <!-- 4 -->
+            <tr>
+              <td>
+                <div class="font-semibold">4) 3D proximity clumps / hotspots</div>
+                <div class="mt-2">
+                  <span class="category-badge badge-3d">3D clumps</span>
+                  <span class="category-badge badge-asa">Surface annotation</span>
+                  <span class="category-badge badge-stat">Significance</span>
+                </div>
+                <div class="text-xs muted mt-2">In [R1], CLUMPS-PTM is mentioned as a tool family for PTM clumps.</div>
+              </td>
+              <td class="small">
+                线性不相邻的位点是否在 3D 上聚集，构成调控热点？
+                这些热点是否更偏表面/loop（更易被酶作用或介导互作）？
+              </td>
+              <td class="small">
+                3D 坐标（Cα/原子）、位点集合；<br/>
+                clump 内 SS 构成、ASA/SASA summary（mean/median）。
+              </td>
+              <td class="small">
+                距离阈值构图（e.g., Cα &lt; 8Å） + 社区发现；<br/>
+                或 clumping significance 方法（CLUMPS-PTM 思路）；<br/>
+                与随机位点背景对照。
+              </td>
+              <td class="small">
+                clump 表：成员位点、clump 暴露度/SS 构成、蛋白域注释；<br/>
+                “功能/通路”富集；用于定位潜在功能界面或口袋附近调控位点。
+              </td>
+            </tr>
+
+            <!-- 5 -->
+            <tr>
+              <td>
+                <div class="font-semibold">5) Variant → PTM loss mechanisms</div>
+                <div class="mt-2">
+                  <span class="category-badge badge-var">SNP / somatic</span>
+                  <span class="category-badge badge-3d">Cluster proximity</span>
+                  <span class="category-badge badge-asa">Accessibility</span>
+                </div>
+                <div class="text-xs muted mt-2">Matches your example: 簇中 SNP 导致 PTM 消失 → 疾病相关 → 脱靶。</div>
+              </td>
+              <td class="small">
+                变异如何导致 PTM 消失或降低？是 “直接破坏 motif/残基” 还是 “改变局部可及性/结构环境”？
+              </td>
+              <td class="small">
+                变异位点（ClinVar/TCGA/自有数据）与 PTM 位点映射；<br/>
+                3D 邻近关系；位点 ASA/SASA（暴露度）。
+              </td>
+              <td class="small">
+                富集：PTM 位点/±5 aa/3D clump 邻域的变异富集检验；<br/>
+                机制分型：direct vs accessibility vs interface/cluster；
+                （[R1] 强调 PTM 改变与机制解释/潜在治疗关联）
+              </td>
+              <td class="small">
+                候选清单：Variant-PTM pairs + 分型标签；<br/>
+                “高优先级脱靶”集合：位于 exposed clump / 功能区 的 PTM loss；<br/>
+                为后续药物策略提供靶点层线索。
+              </td>
+            </tr>
+
+            <!-- 6 -->
+            <tr>
+              <td>
+                <div class="font-semibold">6) Interface / pocket-focused PTM analysis</div>
+                <div class="mt-2">
+                  <span class="category-badge badge-3d">Interface/pocket</span>
+                  <span class="category-badge badge-asa">ΔSASA idea</span>
+                  <span class="category-badge badge-stat">Hotspot enrichment</span>
+                </div>
+              </td>
+              <td class="small">
+                PTM 是否富集在蛋白互作界面、二聚化界面或配体结合口袋附近？
+                这些 PTM 是否更可能是调控位点（而非旁观）？
+              </td>
+              <td class="small">
+                单体结构：ASA/SASA + SS；<br/>
+                若有复合物：界面定义可用 ΔSASA（结合前后暴露变化）。
+              </td>
+              <td class="small">
+                先筛 surface PTM（exposed）；再与界面/口袋残基集合做富集；
+                结合 3D clumps 与变异富集强化机制证据。
+              </td>
+              <td class="small">
+                界面 PTM hotspot 列表；对接互作网络/结构域；<br/>
+                可用于提出“阻断互作/稳定构象”的干预假设。
+              </td>
+            </tr>
+
+            <!-- 7 -->
+            <tr>
+              <td>
+                <div class="font-semibold">7) Therapeutic linkage (upstream enzymes)</div>
+                <div class="mt-2">
+                  <span class="category-badge badge-drug">Actionability</span>
+                  <span class="category-badge badge-1d">Motif/sequence</span>
+                  <span class="category-badge badge-asa">Surface filter</span>
+                </div>
+                <div class="text-xs muted mt-2">In [R1], kinase-related analyses are used to interpret phosphosite changes and crosstalk.</div>
+              </td>
+              <td class="small">
+                把 “差异 PTM / 串扰对 / 3D clump / PTM loss” 连接到上游酶（kinase、acetyltransferase 等），形成可干预链条：
+                <b>位点 → 上游酶 → 药物</b>。
+              </td>
+              <td class="small">
+                位点集合（差异/簇/串扰） + sequence context（motif）；
+                用 ASA/SASA 做“可访问性过滤”（buried 降权）。
+              </td>
+              <td class="small">
+                上游酶归因（motif-based / kinase library 思路 / set enrichment 思路）；
+                与药物/通路知识库对接（你可按项目资源选用）。
+              </td>
+              <td class="small">
+                “酶-位点-证据”表；候选靶点排序；联合用药假设（特别适合：串扰对 + 3D clump + 变异证据）。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Expandable: how to write as paper -->
+      <div class="mt-5">
+        <details class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <summary class="font-semibold text-slate-900">How to report in a paper（建议的 Results 组织方式）</summary>
+          <div class="mt-3 text-sm text-slate-700 space-y-3">
+            <div>
+              <div class="font-medium text-slate-900">Figure set A: Structural preference</div>
+              <p class="muted">
+                先给出不同 PTM 类型在 <span class="kbd">SS</span> 与 <span class="kbd">Exposure</span> 上的富集（OR、FDR），
+                再对比不同组别/亚型的差异（对齐 [R1] 通过分组解释 PTM 主题的写法）。
+              </p>
+            </div>
+            <div>
+              <div class="font-medium text-slate-900">Figure set B: Crosstalk (±5 aa → 3D clumps)</div>
+              <p class="muted">
+                用 ±5 aa 共现筛候选串扰对 → 再做 3D clumps 验证 → 用 ASA/SASA 说明“位点可及性/机制合理性”。
+                这一步能自然衔接到“变异破坏 → 功能失衡 → 潜在治疗”。
+              </p>
+            </div>
+            <div>
+              <div class="font-medium text-slate-900">Figure set C: Variant-driven PTM loss</div>
+              <p class="muted">
+                把变异影响分为 <span class="kbd">direct</span> / <span class="kbd">accessibility</span> / <span class="kbd">interface/cluster</span>，
+                并给出每类的代表例子（结构图 + ASA/SASA/SS 注释）。
+              </p>
+            </div>
+            <div>
+              <div class="font-medium text-slate-900">Figure set D: Actionability</div>
+              <p class="muted">
+                把 “差异位点集合/串扰对/3D clump/变异证据” 映射到上游酶与药物候选，形成可执行的靶点优先级清单。
+              </p>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- References -->
+    <div class="card p-5 mt-6">
+      <h2 class="text-lg font-semibold text-slate-900 mb-2">References</h2>
+      <ol class="list-decimal pl-5 text-sm text-slate-700 space-y-2">
+        <li>
+          <b>[R1]</b> Geffen et al. (Cell, 2023). Multi-omics / PTM-centric analyses (includes PTM enrichment, crosstalk logic, and mentions clumps/CLUMPS-PTM usage in the methods/tooling list).<br/>
+          <span class="muted">Link (ScienceDirect):</span>
+          <a class="text-blue-700 underline" href="https://www.sciencedirect.com/science/article/pii/S009286742300781X" target="_blank" rel="noopener noreferrer">
+            https://www.sciencedirect.com/science/article/pii/S009286742300781X
+          </a>
+        </li>
+      </ol>
+      <p class="muted text-xs mt-3">
+        Note: 如果你还需要把 CLUMPS-PTM、PTM-SEA、Kinase Library 等工具对应到“你项目里实际会用的实现”，我可以按你已有数据字段直接补一份“字段级的输入/输出模板”并嵌进本页面。
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-xs muted mt-6">
+      Generated template for PTM downstream analyses using DSSP + ASA/SASA features.
+    </div>
+  </div>
+</body>
+</html>
+```

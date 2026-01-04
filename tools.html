@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTM 预测工具 Motif 特性对比</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            margin-right: 0.25rem;
+            white-space: nowrap;
+        }
+
+        .badge-yes { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-partial { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+        .badge-no { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+        .citation-count {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        .detail-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-left: 2px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Sticky header */
+        th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 text-slate-800">
+
+    <div class="max-w-[100rem] mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">PTM 预测工具 Motif 依赖性对比表</h1>
+            <p class="text-slate-600">对比主流预测工具的发表期刊、引用量及 Motif 建模策略（合并版）。</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[1500px]">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="p-4 font-bold text-slate-700 w-[10%]">预测工具 (Tool)</th>
+                            <th class="p-4 font-semibold text-slate-600 w-[14%]">发表信息<br><span class="text-xs font-normal text-slate-400">(Publication)</span></th>
+                            <th class="p-4 font-semibold text-slate-600 w-[6%] text-right">引用 (Cit.)</th>
+                            <th class="p-4 font-semibold text-emerald-700 w-[18%] bg-emerald-50/50 border-r border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    Strong Motif (Yes)
+                                </div>
+                                <div class="text-xs font-normal text-emerald-600 mt-1">直接匹配固定模式/共识</div>
+                            </th>
+                            <th class="p-4 font-semibold text-amber-700 w-[18%] bg-amber-50/50 border-r border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    Partial / Context
+                                </div>
+                                <div class="text-xs font-normal text-amber-600 mt-1">依赖 Sequon 上下文/弱共识</div>
+                            </th>
+                            <th class="p-4 font-semibold text-slate-600 w-[16%] bg-slate-50/50 border-r border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                    No Wide Motif (No)
+                                </div>
+                                <div class="text-xs font-normal text-slate-500 mt-1">无通用 Motif (依赖结构/特征)</div>
+                            </th>
+                            <th class="p-4 font-semibold text-slate-700 w-[18%]">备注 / 核心机制</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+
+                        <!-- Lipidation -->
+                        <tr class="bg-slate-100/50">
+                            <td colspan="7" class="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Lipidation (Prenylation, Myristoylation, Palmitoylation)</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">PrePS</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Genome Biology, 2005</td>
+                            <td class="p-4 align-top text-right citation-count">268</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <div><span class="category-badge badge-yes">Farnesylation</span></div>
+                                <div><span class="category-badge badge-yes">Geranylgeranylation</span></div>
+                                <div class="detail-text">Clear CaaX / CC / CXC motifs</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">围绕 C 端 prenylation motif 及酶识别特异性建模。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">NMT</td>
+                            <td class="p-4 align-top text-sm text-slate-600">J. Mol. Biol., 2002</td>
+                            <td class="p-4 align-top text-right citation-count">300</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-yes">N-myristoylation</span>
+                                <div class="detail-text">Clear (N-term Gly; MG... pattern)</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">经典规则/特征预测 N-myristoylation (two-step)。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">Myristoylator</td>
+                            <td class="p-4 align-top text-sm text-slate-600">PROTEOMICS, 2004</td>
+                            <td class="p-4 align-top text-right citation-count">254</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-yes">N-myristoylation</span>
+                                <div class="detail-text">N-term Gly + PS00008</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">强规则筛选：仅 N-terminal Glycines 会发生豆蔻酰化 (ExPASy)。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">GPS-Lipid</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Sci. Reports, 2016</td>
+                            <td class="p-4 align-top text-right citation-count">171</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <div><span class="category-badge badge-yes">S-farnesylation</span></div>
+                                <div><span class="category-badge badge-yes">N-myristoylation</span></div>
+                                <div class="detail-text">Clear for prenyl/myristoyl</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-no">S-palmitoylation</span>
+                                <div class="detail-text">多样模式/局部环境</div>
+                            </td>
+                            <td class="p-4 align-top text-sm text-slate-600">明确整合四类脂质修饰，但 Palmitoylation 处理方式不同于前三者。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">CSS-Palm</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Bioinformatics, 2006</td>
+                            <td class="p-4 align-top text-right citation-count">184</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-no">S-palmitoylation</span>
+                                <div class="detail-text">无统一 Canonical Motif</div>
+                            </td>
+                            <td class="p-4 align-top text-sm text-slate-600">采用 Clustering and Scoring 策略，指出棕榈酰化缺乏统一 Motif。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">GPS-Palm</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Brief. Bioinform., 2021</td>
+                            <td class="p-4 align-top text-right citation-count">133</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-no">S-palmitoylation</span>
+                                <div class="detail-text">Weak</div>
+                            </td>
+                            <td class="p-4 align-top text-sm text-slate-600">基于深度学习 (Deep Learning) 的预测与可视化系统。</td>
+                        </tr>
+                         <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">CKSAAP-Palm</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Bioinformatics, 2009</td>
+                            <td class="p-4 align-top text-right citation-count">95</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-no">S-palmitoylation</span>
+                                <div class="detail-text">Weak</div>
+                            </td>
+                            <td class="p-4 align-top text-sm text-slate-600">使用 k-spaced amino acid pairs 组分特征。</td>
+                        </tr>
+
+
+                        <!-- Glycosylation -->
+                        <tr class="bg-slate-100/50">
+                            <td colspan="7" class="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Glycosylation</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">NetNGlyc 1.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Pacific Symp. Biocomp., 2002</td>
+                            <td class="p-4 align-top text-right citation-count">1357</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-yes">N-glycosylation</span>
+                                <div class="detail-text">N-X-S/T sequon context</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">DTU/CBS 系列，使用 ANN 基于 Sequon 上下文进行预测。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">N-GlyDE</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Sci. Reports, 2019</td>
+                            <td class="p-4 align-top text-right citation-count">79</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-yes">N-glycosylation</span>
+                                <div class="detail-text">N-X-S/T + context</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">针对“Sequon 不等于真位点”的两阶段预测框架。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">SPRINT-Gly</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Bioinformatics, 2019</td>
+                            <td class="p-4 align-top text-right citation-count">84</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-yes">N-glycosylation</span>
+                                <div class="detail-text">Clear</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">O-glycosylation</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">利用序列 + 预测结构属性进行预测。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">NetOGlyc 4.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">EMBO J, 2013</td>
+                            <td class="p-4 align-top text-right citation-count">1639</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-no">O-GalNAc</span>
+                                <div class="detail-text">缺少硬共识，高度依赖上下文</div>
+                            </td>
+                            <td class="p-4 align-top text-sm text-slate-600">O-GalNAc 通常无像 NXS/T 那样的明确 Sequon，预测难度较高。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">ISOGlyP</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Glycobiology, 2021</td>
+                            <td class="p-4 align-top text-right citation-count">39</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">O-GalNAc</span>
+                                <div class="detail-text">Isoform-specific partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">异构体特异性 (Isoform-specific) GalNAc-T 偏好建模。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">NetCGlyc 1.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Glycobiology, 2007</td>
+                            <td class="p-4 align-top text-right citation-count">221</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-yes">C-mannosylation</span>
+                                <div class="detail-text">W-X-X-W consensus</div>
+                            </td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">论文明确提到 WXXW consensus motif 被用于建模输入特征之一。</td>
+                        </tr>
+
+                        <!-- GPI Anchor -->
+                        <tr class="bg-slate-100/50">
+                            <td colspan="7" class="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">GPI-Anchor</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">big-PI</td>
+                            <td class="p-4 align-top text-sm text-slate-600">J. Mol. Biol., 2004</td>
+                            <td class="p-4 align-top text-right citation-count">369</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">GPI-anchor</span>
+                                <div class="detail-text">Partial (ω-site + signal)</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">早期广泛使用的 GPI 预测器。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">PredGPI</td>
+                            <td class="p-4 align-top text-sm text-slate-600">BMC Bioinf., 2008</td>
+                            <td class="p-4 align-top text-right citation-count">396</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">GPI-anchor</span>
+                                <div class="detail-text">C-term signal pattern</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">利用 SVM + HMM 预测 C 端 GPI 锚定信号及 ω-site。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">GPI-SOM</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Bioinformatics, 2005</td>
+                            <td class="p-4 align-top text-right citation-count">160</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">GPI-anchor</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">基于 Kohonen self-organizing map (SOM) 的预测。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">NetGPI</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Cur. Res. Biotech, 2021</td>
+                            <td class="p-4 align-top text-right citation-count">154</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">GPI-anchor</span>
+                                <div class="detail-text">ω-site + C端信号复合特征</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">RNN+Attention 深度学习模型，重点指向 ω-site。</td>
+                        </tr>
+
+                        <!-- SUMOylation -->
+                        <tr class="bg-slate-100/50">
+                            <td colspan="7" class="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">SUMOylation</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">SUMOsp</td>
+                            <td class="p-4 align-top text-sm text-slate-600">NAR, 2006</td>
+                            <td class="p-4 align-top text-right citation-count">257</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">SUMOylation</span>
+                                <div class="detail-text">Partial (consensus ψKxE/D)</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">早期经典预测工具之一。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">SUMOsp 2.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">PROTEOMICS, 2009</td>
+                            <td class="p-4 align-top text-right citation-count">313</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">SUMOylation</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">更新的模型和服务器版本。</td>
+                        </tr>
+                         <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">GPS-SUMO</td>
+                            <td class="p-4 align-top text-sm text-slate-600">NAR, 2014</td>
+                            <td class="p-4 align-top text-right citation-count">622</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">SUMOylation / SIM</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">GPS 框架扩展至 SUMO 位点 + SIMs 预测。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">GPS-SUMO 2.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">NAR, 2024</td>
+                            <td class="p-4 align-top text-right citation-count">34</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">SUMOylation / SIM</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">广泛使用 ΨKxE 作为核心信号，同时提供 SIM 预测（非共价相互作用）。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">JASSA</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Bioinformatics, 2015</td>
+                            <td class="p-4 align-top text-right citation-count">193</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">SUMOylation</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">使用体内 SUMO 化蛋白作为上下文特征 (in vivo context)。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">SUMOgo</td>
+                            <td class="p-4 align-top text-sm text-slate-600">Sci. Reports, 2018</td>
+                            <td class="p-4 align-top text-right citation-count">52</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">SUMOylation</span>
+                                <div class="detail-text">遵循共识模型</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">结合序列与 GO 语义相似度；讨论了不遵循共识的模型。</td>
+                        </tr>
+
+                        <!-- Phosphorylation -->
+                        <tr class="bg-slate-100/50">
+                            <td colspan="7" class="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Phosphorylation</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">Scansite 2.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">NAR, 2003</td>
+                            <td class="p-4 align-top text-right citation-count">2048</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">Phosphorylation</span>
+                                <div class="detail-text">Partial (kinase-specific)</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">信号蛋白 Motif 扫描，广泛用于激酶 Motif 查询。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">KinasePhos 2.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">NAR, 2008</td>
+                            <td class="p-4 align-top text-right citation-count">422</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">Phosphorylation</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">激酶组特异性 (Kinase group–specific) 磷酸化位点预测。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">GPS 6.0</td>
+                            <td class="p-4 align-top text-sm text-slate-600">NAR, 2023</td>
+                            <td class="p-4 align-top text-right citation-count">101</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-partial">Phosphorylation</span>
+                                <div class="detail-text">Partial</div>
+                            </td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top text-sm text-slate-600">最新的 GPS 磷酸化预测平台 (GPS 5.0 的更新版)。</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 align-top font-bold text-indigo-700">NetPhos</td>
+                            <td class="p-4 align-top text-sm text-slate-600">PROTEOMICS, 2004</td>
+                            <td class="p-4 align-top text-right citation-count">2584</td>
+                            <td class="p-4 align-top bg-emerald-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-amber-50/10 border-r border-slate-100 text-center text-slate-400">-</td>
+                            <td class="p-4 align-top bg-slate-50/10 border-r border-slate-100">
+                                <span class="category-badge badge-no">General PTM</span>
+                                <div class="detail-text">Weak / Partial</div>
+                            </td>
+                            <td class="p-4 align-top text-sm text-slate-600">通用 PTM 预测框架论文；常被引用于 NetPhos 相关工作。</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
