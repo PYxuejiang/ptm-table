@@ -33,7 +33,7 @@ DSSP 返回的 0–1 直接作为 dssp_rsa（也可理解 rel RSA）
 
 不再用 MAX_ASA
 
-绝对暴露度用 FreeSASA sasa_total（你明确要这样做）
+绝对暴露度用 FreeSASA sasa_total（明确要这样做）
 """
 
 from __future__ import annotations
@@ -434,3 +434,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
